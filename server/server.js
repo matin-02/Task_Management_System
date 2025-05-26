@@ -67,4 +67,4 @@ process.on('unhandledRejection', (err) => {
   server.close(() => process.exit(1));
 });
 
-module.exports = app; 
+module.exports = app; // Required for Vercel
