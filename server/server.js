@@ -9,41 +9,45 @@ const app = express();
 // Enhanced CORS configuration
 const corsOptions = {
   origin: [
-    process.env.FRONTEND_URL, 
+    process.env.FRONTEND_URL,
     'http://localhost:5173'
   ],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PATCH', 'DELETE']
 };
 app.use(cors(corsOptions));
 
-// Middleware
+// Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK',
+// API Routes
+app.use('/api/tasks', taskRoutes);
+
+// Health check endpoint (required for Vercel)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'API Running',
+    version: '1.0.0',
     timestamp: new Date().toISOString()
   });
 });
 
-// Routes
-app.use('/api/tasks', taskRoutes);
-
-// Database connection with enhanced configuration
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  retryWrites: true,
-  w: 'majority'
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => {
-  console.error('MongoDB connection error:', err);
-  process.exit(1);
-});
+// Database connection with retry logic
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      retryWrites: true,
+      w: 'majority'
+    });
+    console.log('MongoDB Connected');
+  } catch (err) {
+    console.error('MongoDB Connection Error:', err);
+    process.exit(1);
+  }
+};
+connectDB();
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -58,13 +62,6 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  server.close(() => process.exit(1));
-});
-
-module.exports = app; // Required for Vercel
+module.exports = app; // Critical for Vercel
