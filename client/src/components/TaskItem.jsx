@@ -38,7 +38,7 @@ const TaskItem = ({ task, onDelete, onToggleComplete }) => {
         <div className="task-header">
           <h3 className={task.completed ? 'completed' : ''}>{task.title}</h3>
           <div className="task-meta">
-            
+            {/* Removed the medium priority exclusion */}
             <span className="priority-badge" style={{ backgroundColor: priorityColors[task.priority] }}>
               <span className="priority-icon">{priorityIcons[task.priority]}</span>
               {task.priority}
