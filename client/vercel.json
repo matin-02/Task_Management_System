@@ -1,11 +1,15 @@
 {
   "version": 2,
-  "builds": [{
-    "src": "vite.config.js",
-    "use": "@vitejs/vercel"
-  }],
-  "routes": [{
-    "src": "/(.*)",
-    "dest": "dist"
-  }]
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "http://localhost:5000/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }
