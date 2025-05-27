@@ -3,7 +3,7 @@
   "builds": [
     {
       "src": "vite.config.js",
-      "use": "@vitejs/vercel"
+      "use": "vite"
     }
   ],
   "routes": [
